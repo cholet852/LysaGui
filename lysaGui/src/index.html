@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>LysaGui</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <script type="text/javascript">
+
+        var baseURI = document.getElementById("base").href;
+
+        var Prerequisites = {
+
+            isSupportedBrowser: function ()
+            {
+                // Check IE 10 or older
+                var userAgent = window.navigator.userAgent;
+                return userAgent.indexOf('MSIE ') === -1;
+            }
+
+        };
+
+        if (!Prerequisites.isSupportedBrowser())
+        {
+            window.location = baseURI + "unsupported-browser.html";
+        }
+
+    </script>
+
+</head>
+<body>
+  <app-root></app-root>
+</body>
+</html>
