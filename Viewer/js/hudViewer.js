@@ -18,3 +18,11 @@ function HUDViewer(viewMan)
     var container = this.view_manager.domElement3D;
     container.appendChild(div_stat);
 }
+
+HUDViewer.prototype.animate = function ()
+{
+    this.stats.update();
+    //this.viewcube.render();
+
+    //TWEEN.update();
+}

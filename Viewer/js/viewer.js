@@ -35,8 +35,20 @@ Viewer3D.prototype.update = function()
     this.outlinePass.renderScene = this.sceneGlobal;
     this.outlinePass.renderCamera = this.camera;
     this.shaderPass.viewer = this;
-    //this.composer.render();
-    this.view_manager.renderer.render(this.scene, this.camera);
+    this.composer.render();
+    this.calcDimensions();
+}
+
+Viewer3D.prototype.calcDimensions = function()
+{
+    this.debutX = $(this.div).offset().left + this.left;
+    this.finX = this.debutX + this.width;
+    
+    var botdiv = $(this.div).offset().top + this.bottom;
+    this.debutY = botdiv;    
+    this.finY = botdiv + this.height;
+
+    //this.svg_manager.updateDimensions();
 }
 
 Viewer3D.prototype.init = function(div, left, bottom, width, height, nameview, color, type)
@@ -88,4 +100,46 @@ Viewer3D.prototype.init = function(div, left, bottom, width, height, nameview, c
     this.shaderPassView = new THREE.ShaderPass(THREE.MainViewShader);
     this.shaderPassView.renderToScreen = true;
     this.composer.addPass(this.shaderPassView);
+
+    //ITEM
+    var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+    var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+    var cube = new THREE.Mesh( geometry, material );
+    this.scene.add( cube );
+
+    this.camera.position.z = 5;
+
+    // Environement -------------------------------------------------------------------              
+
+    this.initLights();
+}
+
+Viewer3D.prototype.initLights = function()
+{
+    var light = new THREE.AmbientLight(0x808080);
+    this.scene.add(light);
+       
+    var dirLight = new THREE.DirectionalLight(0xffffff, 0.15);
+    dirLight.position.set(0, 0, 1000);
+    this.scene.add(dirLight);
+
+    var dirLight2 = new THREE.DirectionalLight(0xffffff, 0.15);
+    dirLight2.position.set(0, 0, -1000);
+    this.scene.add(dirLight2);
+
+    var dirLight3 = new THREE.DirectionalLight(0xffffff, 0.15);
+    dirLight3.position.set(1000, 0, 0);
+    this.scene.add(dirLight3);
+
+    var dirLight4 = new THREE.DirectionalLight(0xffffff, 0.15);
+    dirLight4.position.set(-1000, 0, 0);
+    this.scene.add(dirLight4);
+
+    var dirLight5 = new THREE.DirectionalLight(0xffffff, 0.3);
+    dirLight5.position.set(0, -1000, 0);
+    this.scene.add(dirLight5);
+
+    var dirLight6 = new THREE.DirectionalLight(0xffffff, 0.3);
+    dirLight6.position.set(0, 1000, 0);
+    this.scene.add(dirLight6);
 }

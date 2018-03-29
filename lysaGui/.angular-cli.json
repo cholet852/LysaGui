@@ -30,6 +30,8 @@
         "../../Viewer/frameworks/ShaderPass.js",
         "../../Viewer/frameworks/OutlinePassV2.js",
         "../../Viewer/frameworks/CopyShader.js",
+        "../../Viewer/frameworks/VignetteShader.js",
+        "../../Viewer/frameworks/mainViewShader.js",
         "../../Viewer/js/viewManager.js",
         "../../Viewer/js/hudViewer.js",
         "../../Viewer/js/viewer.js"

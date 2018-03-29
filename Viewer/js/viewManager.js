@@ -18,6 +18,7 @@ ViewManager.prototype.init = function ()
     //viewers
     var width = $(this.domElement3D).width();
     var height = $(this.domElement3D).height();
+    console.log(width, height, this.domElement3D)
 
     this.renderer = new THREE.WebGLRenderer({ antialias: false, precision: "lowp", stencil: true, depth: true, preserveDrawingBuffer: true });
     this.renderer.setSize(width, height);
@@ -45,8 +46,9 @@ ViewManager.prototype.animate = function ()
         this.viewers[i].update();
     }
 
-    //this.hud_viewer.animate();  
+    this.hud_viewer.animate();  
 }
+
 // ViewManager.prototype.init = function ()
 // {
 //     var scene = new THREE.Scene();
