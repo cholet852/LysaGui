@@ -29,6 +29,10 @@ export class HomePageComponent implements OnInit
 
     public ngOnInit(): void
     {
+        this.route.params.subscribe(( params: Params ) =>
+        {
+            
+        });
     }
 
     //#endregion

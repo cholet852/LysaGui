@@ -22,8 +22,17 @@
         "styles.css"
       ],
       "scripts": [
+        "../../Viewer/frameworks/jquery-3.2.1.min.js",
         "../../Viewer/frameworks/three.min.r88.js",
-        "../../Viewer/js/viewManager.js"
+        "../../Viewer/frameworks/stats.min.js",
+        "../../Viewer/frameworks/EffectComposer.js",
+        "../../Viewer/frameworks/RenderPass.js",
+        "../../Viewer/frameworks/ShaderPass.js",
+        "../../Viewer/frameworks/OutlinePassV2.js",
+        "../../Viewer/frameworks/CopyShader.js",
+        "../../Viewer/js/viewManager.js",
+        "../../Viewer/js/hudViewer.js",
+        "../../Viewer/js/viewer.js"
       ],
       "environmentSource": "environments/environment.ts",
       "environments": {

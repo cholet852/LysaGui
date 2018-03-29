@@ -15,5 +15,8 @@
   "include": [
     "**/*.spec.ts",
     "**/*.d.ts"
-  ]
+  ],
+  "types": [
+        "3d.d.ts"
+    ]
 }
