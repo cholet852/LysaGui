@@ -22,7 +22,6 @@
         "styles.css"
       ],
       "scripts": [
-        "../../models",
         "../../Viewer/frameworks/jquery-3.2.1.min.js",
         "../../Viewer/frameworks/three.min.r88.js",
         "../../Viewer/frameworks/stats.min.js",

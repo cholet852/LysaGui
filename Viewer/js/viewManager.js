@@ -20,10 +20,15 @@ ViewManager.prototype.init = function ()
     var height = $(this.domElement3D).height();
     console.log(width, height, this.domElement3D)
 
-    this.renderer = new THREE.WebGLRenderer({ antialias: false, precision: "lowp", stencil: true, depth: true, preserveDrawingBuffer: true });
-    this.renderer.setSize(width, height);
-    this.renderer.localClippingEnabled = true;
-    this.renderer.domElement.style.position = 'absolute';
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, precision: "lowp", stencil: true, depth: true, preserveDrawingBuffer: true });
+    //this.renderer.setSize(width, height);
+    //this.renderer.localClippingEnabled = true;
+    //this.renderer.domElement.style.position = 'absolute';
+    this.renderer.setPixelRatio( window.devicePixelRatio );
+	this.renderer.setSize( window.innerWidth, window.innerHeight );
+	this.renderer.gammaInput = true;
+	this.renderer.gammaOutput = true;
+	this.renderer.shadowMap.enabled = true;
 
     var container = this.domElement3D;
     container.appendChild(this.renderer.domElement);

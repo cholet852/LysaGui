@@ -41,21 +41,23 @@ THREE.STLLoader.prototype = {
 	constructor: THREE.STLLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
+		console.log(url);
 
 		var scope = this;
 
 		var loader = new THREE.FileLoader( scope.manager );
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function ( text ) {
-
+			console.log(url);
+			console.log(text);
 			try {
 
 				onLoad( scope.parse( text ) );
-
+				console.log("okkk");
 			} catch ( exception ) {
 
 				if ( onError ) {
-
+					console.log("pas okkk");
 					onError( exception );
 
 				}

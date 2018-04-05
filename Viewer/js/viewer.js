@@ -7,6 +7,7 @@ function Viewer3D(viewMan)
     this.sceneGlobal = null;
 
     this.camera = null;
+    this.cameraTarget = null;
     this.composer = null;
     this.renderpass = null;
     this.shaderPass = null;
@@ -22,21 +23,12 @@ function Viewer3D(viewMan)
 
 Viewer3D.prototype.update = function()
 {
-    this.view_manager.renderer.setClearColor(this.backgroundcolor);
-    this.view_manager.renderer.setScissorTest(true);
-    this.view_manager.renderer.setViewport(this.left, this.bottom, this.width, this.height);
-    this.view_manager.renderer.setScissor(this.left, this.bottom, this.width, this.height);
+    var timer = Date.now() * 0.0005;
+    this.camera.position.x = Math.cos( timer ) * 3;
+    this.camera.position.z = Math.sin( timer ) * 3;
 
-    this.renderPass.scene = this.sceneGlobal;
-    this.renderPass.camera = this.camera;
-    this.renderPass.viewer = this;
-    this.outlinePass.viewer = this;
-    this.outlinePass.resolution = new THREE.Vector2(this.width, this.height);
-    this.outlinePass.renderScene = this.sceneGlobal;
-    this.outlinePass.renderCamera = this.camera;
-    this.shaderPass.viewer = this;
-    this.composer.render();
-    this.calcDimensions();
+    this.camera.lookAt( this.cameraTarget );
+    this.view_manager.renderer.render(this.sceneGlobal, this.camera)
 }
 
 Viewer3D.prototype.calcDimensions = function()
@@ -69,14 +61,14 @@ Viewer3D.prototype.init = function(div, left, bottom, width, height, nameview, c
     // create main scene ------------------------------------------------------------
 
     this.sceneGlobal = new THREE.Scene();
-    window.scene = this.sceneGlobal;
+    //window.scene = this.sceneGlobal;
     this.sceneGlobal.background = new THREE.Color( 0x72645b );
-	this.sceneGlobal.fog = new THREE.Fog( 0x72645b, 2, 15 );
+	//this.sceneGlobal.fog = new THREE.Fog( 0x72645b, 2, 15 );
 
-    this.sceneGlobalOutline = new THREE.Scene();
+    //this.sceneGlobalOutline = new THREE.Scene();
 
-    this.scene = new THREE.Object3D();
-    this.sceneGlobal.add(this.scene);
+    //this.scene = new THREE.Object3D();
+    //this.sceneGlobal.add(this.scene);
 
     // Ground
     var plane = new THREE.Mesh(
@@ -92,89 +84,76 @@ Viewer3D.prototype.init = function(div, left, bottom, width, height, nameview, c
 
     //this.camera = new THREE.PerspectiveCamera(35, this.width / this.height, 1, 15);
     this.camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 15 );
-    this.camera.position.set( 1, 0.15, 3 );
+    this.camera.position.set( 3, 0.15, 3 );
 	this.cameraTarget = new THREE.Vector3( 0, -0.25, 0 );
 
-    //this.sceneGlobal.add(this.camera);    
-    //this.camera.updateProjectionMatrix();
-
-    //COMPOSER ------------------------------------------------------------
-
-    this.composer = new THREE.EffectComposer(this.view_manager.renderer);
-    this.renderPass = new THREE.RenderPass(this, this.sceneGlobal, this.camera);
-    this.composer.addPass(this.renderPass);
-
-    this.outlinePass = new THREE.OutlinePass(this, new THREE.Vector2(this.width_div, this.height_div), this.sceneGlobal, this.camera);
-    this.outlinePass.edgeStrength = 5;
-    this.outlinePass.edgeGlow = 0;
-    this.outlinePass.edgeThickness = 0.5;
-    this.outlinePass.pulsePeriod = 0;
-    this.outlinePass.visibleEdgeColor = new THREE.Color(0x11E1D3);
-    this.outlinePass.hiddenEdgeColor = new THREE.Color(0x11E1D3);
-    this.composer.addPass(this.outlinePass);
-
-    this.shaderPass = new THREE.ShaderPass(THREE.VignetteShader);        
-    this.composer.addPass(this.shaderPass);
-    this.shaderPassView = new THREE.ShaderPass(THREE.MainViewShader);
-    this.shaderPassView.renderToScreen = true;
-    this.composer.addPass(this.shaderPassView);
+    this.sceneGlobal.add(this.camera);    
+    this.camera.updateProjectionMatrix();
 
     //ITEM
-    var geometry = new THREE.BoxGeometry( 1, 1, 1 );
-    var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+    var geometry = new THREE.BoxGeometry( 0.5, 0.5, 0.5 );
+    var material = new THREE.MeshPhongMaterial( { color: 0xff5533, specular: 0x111111, shininess: 200 } );
     var cube = new THREE.Mesh( geometry, material );
-    this.scene.add( cube );
+    cube.position.set( 0, - 0.25, 0.6 );
+    cube.castShadow = true;
+	cube.receiveShadow = true;
+    //this.sceneGlobal.add( cube );
 
-    var loader = new THREE.STLLoader();
+    var loader = new THREE.FileLoader();
+    loader.setResponseType('arraybuffer');
 
-    var material = new THREE.MeshPhongMaterial( { color: 0xAAAAAA, specular: 0x111111, shininess: 200 } );
-				loader.load( '../../models/docisk_kuli.stl', function ( geometry ) {
+    var url = "http://localhost:4200/assets/models/slotted_disk.stl";
+
+    loader.load(url, function (data)
+        {
+            var loader = new THREE.STLLoader();
+            var blob = new Blob([data], { type: 'application/octet-stream'} );
+            var content = window.URL.createObjectURL(blob);
+            
+            loader.load( content, function ( geometry )
+             {
+                    console.log("jjjjj");
+					var material = new THREE.MeshPhongMaterial( { color: 0xff5533, specular: 0x111111, shininess: 200 } );
 					var mesh = new THREE.Mesh( geometry, material );
-					mesh.position.set( 0, - 0.37, - 0.6 );
-					mesh.rotation.set( - Math.PI / 2, 0, 0 );
-					mesh.scale.set( 2, 2, 2 );
+					mesh.position.set( 0, - 0.25, 0.6 );
+					mesh.rotation.set( 0, - Math.PI / 2, 0 );
+					mesh.scale.set( 10, 10, 10);
 					mesh.castShadow = true;
 					mesh.receiveShadow = true;
 					this.sceneGlobal.add( mesh );
 				} );
 
-    this.camera.position.z = 5;
+        }.bind(this));
+
+    
+    
+    //var blob = new Blob([url], { type: 'application/octet-stream'} );
+
+    //var content = window.URL.createObjectURL(blob);
+
+    
 
     // Environement -------------------------------------------------------------------  
 
     this.sceneGlobal.add( new THREE.HemisphereLight( 0x443333, 0x111122 ) );
-				//addShadowedLight( 1, 1, 1, 0xffffff, 1.35 );
-				//addShadowedLight( 0.5, 1, -1, 0xffaa00, 1 );            
-
-    this.initLights();
+    this.addShadowedLight( 1, 1, 1, 0xffffff, 1.35 );
+	this.addShadowedLight( 0.5, 1, -1, 0xffaa00, 1 );
 }
 
-Viewer3D.prototype.initLights = function()
-{
-    var light = new THREE.AmbientLight(0x808080);
-    this.scene.add(light);
-       
-    var dirLight = new THREE.DirectionalLight(0xffffff, 0.15);
-    dirLight.position.set(0, 0, 1000);
-    this.scene.add(dirLight);
-
-    var dirLight2 = new THREE.DirectionalLight(0xffffff, 0.15);
-    dirLight2.position.set(0, 0, -1000);
-    this.scene.add(dirLight2);
-
-    var dirLight3 = new THREE.DirectionalLight(0xffffff, 0.15);
-    dirLight3.position.set(1000, 0, 0);
-    this.scene.add(dirLight3);
-
-    var dirLight4 = new THREE.DirectionalLight(0xffffff, 0.15);
-    dirLight4.position.set(-1000, 0, 0);
-    this.scene.add(dirLight4);
-
-    var dirLight5 = new THREE.DirectionalLight(0xffffff, 0.3);
-    dirLight5.position.set(0, -1000, 0);
-    this.scene.add(dirLight5);
-
-    var dirLight6 = new THREE.DirectionalLight(0xffffff, 0.3);
-    dirLight6.position.set(0, 1000, 0);
-    this.scene.add(dirLight6);
-}
+Viewer3D.prototype.addShadowedLight = function( x, y, z, color, intensity )
+ {
+     var directionalLight = new THREE.DirectionalLight( color, intensity );
+     directionalLight.position.set( x, y, z );
+     this.sceneGlobal.add( directionalLight );
+				directionalLight.castShadow = true;
+				var d = 1;
+				directionalLight.shadow.camera.left = -d;
+				directionalLight.shadow.camera.right = d;
+				directionalLight.shadow.camera.top = d;
+				directionalLight.shadow.camera.bottom = -d;
+				directionalLight.shadow.camera.near = 1;
+				directionalLight.shadow.camera.far = 4;
+				directionalLight.shadow.mapSize.width = 1024;
+				directionalLight.shadow.mapSize.height = 1024;
+				directionalLight.shadow.bias = -0.002;
+ }
