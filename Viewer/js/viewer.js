@@ -8,7 +8,7 @@ function Viewer3D(viewMan)
 
     this.camera = null;
     this.cameraTarget = null;
-    this.composer = null;
+    this.controls = null;
     this.renderpass = null;
     this.shaderPass = null;
     this.shaderPassView = null;
@@ -19,32 +19,23 @@ function Viewer3D(viewMan)
     this.height = 300;
     this.width_div = 0;
     this.height_div = 0;
+
+    this.self = null;
 }
 
 Viewer3D.prototype.update = function()
 {
-    var timer = Date.now() * 0.0005;
-    this.camera.position.x = Math.cos( timer ) * 3;
-    this.camera.position.z = Math.sin( timer ) * 3;
-
-    this.camera.lookAt( this.cameraTarget );
+    // var timer = Date.now() * 0.0005;
+    // this.camera.position.x = Math.cos( timer ) * 3;
+    // this.camera.position.z = Math.sin( timer ) * 3;
     this.view_manager.renderer.render(this.sceneGlobal, this.camera)
-}
-
-Viewer3D.prototype.calcDimensions = function()
-{
-    this.debutX = $(this.div).offset().left + this.left;
-    this.finX = this.debutX + this.width;
-    
-    var botdiv = $(this.div).offset().top + this.bottom;
-    this.debutY = botdiv;    
-    this.finY = botdiv + this.height;
-
-    //this.svg_manager.updateDimensions();
+    this.controls.update();
 }
 
 Viewer3D.prototype.init = function(div, left, bottom, width, height, nameview, color, type)
 {
+    var self = this;
+
     // Initialization ----------------------------------------------------------------
        
     this.name = nameview;
@@ -61,77 +52,44 @@ Viewer3D.prototype.init = function(div, left, bottom, width, height, nameview, c
     // create main scene ------------------------------------------------------------
 
     this.sceneGlobal = new THREE.Scene();
-    //window.scene = this.sceneGlobal;
     this.sceneGlobal.background = new THREE.Color( 0x72645b );
-	//this.sceneGlobal.fog = new THREE.Fog( 0x72645b, 2, 15 );
 
-    //this.sceneGlobalOutline = new THREE.Scene();
+    // Grid
 
-    //this.scene = new THREE.Object3D();
-    //this.sceneGlobal.add(this.scene);
-
-    // Ground
-    var plane = new THREE.Mesh(
-					new THREE.PlaneBufferGeometry( 40, 40 ),
-					new THREE.MeshPhongMaterial( { color: 0x999999, specular: 0x101010 } )
-				);
-    plane.rotation.x = -Math.PI/2;
-	plane.position.y = -0.5;
-	this.sceneGlobal.add( plane );
-	plane.receiveShadow = true;
+    var gridXZ = new THREE.GridHelper(100, 10);
+	gridXZ.setColors( new THREE.Color(0xff0000), new THREE.Color(0xffffff) );
+	this.sceneGlobal.add(gridXZ);
 
     // CAMERA ------------------------------------------------------------
 
     //this.camera = new THREE.PerspectiveCamera(35, this.width / this.height, 1, 15);
-    this.camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 15 );
-    this.camera.position.set( 3, 0.15, 3 );
-	this.cameraTarget = new THREE.Vector3( 0, -0.25, 0 );
+    this.camera = new THREE.PerspectiveCamera( 45, width/height, 0.1, 10000);
+    this.camera.position.y = 160;
+	this.camera.position.z = 400;
+	this.cameraTarget = new THREE.Vector3(0,0,0);
+    this.camera.lookAt( this.cameraTarget );
 
-    this.sceneGlobal.add(this.camera);    
-    this.camera.updateProjectionMatrix();
+    this.sceneGlobal.add(this.camera);
+
+    // CONTROLS
+
+    //this.controls = new THREE.OrbitControls (this.camera, this.view_manager.renderer.domElement);
 
     //ITEM
-    var geometry = new THREE.BoxGeometry( 0.5, 0.5, 0.5 );
-    var material = new THREE.MeshPhongMaterial( { color: 0xff5533, specular: 0x111111, shininess: 200 } );
-    var cube = new THREE.Mesh( geometry, material );
-    cube.position.set( 0, - 0.25, 0.6 );
-    cube.castShadow = true;
-	cube.receiveShadow = true;
-    //this.sceneGlobal.add( cube );
-
-    var loader = new THREE.FileLoader();
-    loader.setResponseType('arraybuffer');
-
-    var url = "http://localhost:4200/assets/models/slotted_disk.stl";
-
-    loader.load(url, function (data)
-        {
-            var loader = new THREE.STLLoader();
-            var blob = new Blob([data], { type: 'application/octet-stream'} );
-            var content = window.URL.createObjectURL(blob);
+    var loaderstl = new THREE.STLLoader();
             
-            loader.load( content, function ( geometry )
+            loaderstl.load( 'assets/models/JawHingeV1.stl', function ( geometry )
              {
                     console.log("jjjjj");
 					var material = new THREE.MeshPhongMaterial( { color: 0xff5533, specular: 0x111111, shininess: 200 } );
 					var mesh = new THREE.Mesh( geometry, material );
-					mesh.position.set( 0, - 0.25, 0.6 );
-					mesh.rotation.set( 0, - Math.PI / 2, 0 );
-					mesh.scale.set( 10, 10, 10);
+					//mesh.position.set( 0, - 0.25, 0.6 );
+					//mesh.rotation.set( 0, - Math.PI / 2, 0 );
+					//mesh.scale.set( 0.01, 0.01, 0.01);
 					mesh.castShadow = true;
 					mesh.receiveShadow = true;
-					this.sceneGlobal.add( mesh );
+					self.sceneGlobal.add( mesh );
 				} );
-
-        }.bind(this));
-
-    
-    
-    //var blob = new Blob([url], { type: 'application/octet-stream'} );
-
-    //var content = window.URL.createObjectURL(blob);
-
-    
 
     // Environement -------------------------------------------------------------------  
 
