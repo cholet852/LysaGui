@@ -70,15 +70,33 @@ Viewer3D.prototype.init = function(div, left, bottom, width, height, nameview, c
 
     this.sceneGlobal = new THREE.Scene();
     window.scene = this.sceneGlobal;
+    this.sceneGlobal.background = new THREE.Color( 0x72645b );
+	this.sceneGlobal.fog = new THREE.Fog( 0x72645b, 2, 15 );
+
     this.sceneGlobalOutline = new THREE.Scene();
+
     this.scene = new THREE.Object3D();
     this.sceneGlobal.add(this.scene);
 
+    // Ground
+    var plane = new THREE.Mesh(
+					new THREE.PlaneBufferGeometry( 40, 40 ),
+					new THREE.MeshPhongMaterial( { color: 0x999999, specular: 0x101010 } )
+				);
+    plane.rotation.x = -Math.PI/2;
+	plane.position.y = -0.5;
+	this.sceneGlobal.add( plane );
+	plane.receiveShadow = true;
+
     // CAMERA ------------------------------------------------------------
 
-    this.camera = new THREE.PerspectiveCamera(45, this.width / this.height, 1, 5000);
-    this.sceneGlobal.add(this.camera);    
-    this.camera.updateProjectionMatrix();
+    //this.camera = new THREE.PerspectiveCamera(35, this.width / this.height, 1, 15);
+    this.camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 15 );
+    this.camera.position.set( 1, 0.15, 3 );
+	this.cameraTarget = new THREE.Vector3( 0, -0.25, 0 );
+
+    //this.sceneGlobal.add(this.camera);    
+    //this.camera.updateProjectionMatrix();
 
     //COMPOSER ------------------------------------------------------------
 
@@ -107,9 +125,26 @@ Viewer3D.prototype.init = function(div, left, bottom, width, height, nameview, c
     var cube = new THREE.Mesh( geometry, material );
     this.scene.add( cube );
 
+    var loader = new THREE.STLLoader();
+
+    var material = new THREE.MeshPhongMaterial( { color: 0xAAAAAA, specular: 0x111111, shininess: 200 } );
+				loader.load( '../../models/docisk_kuli.stl', function ( geometry ) {
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.position.set( 0, - 0.37, - 0.6 );
+					mesh.rotation.set( - Math.PI / 2, 0, 0 );
+					mesh.scale.set( 2, 2, 2 );
+					mesh.castShadow = true;
+					mesh.receiveShadow = true;
+					this.sceneGlobal.add( mesh );
+				} );
+
     this.camera.position.z = 5;
 
-    // Environement -------------------------------------------------------------------              
+    // Environement -------------------------------------------------------------------  
+
+    this.sceneGlobal.add( new THREE.HemisphereLight( 0x443333, 0x111122 ) );
+				//addShadowedLight( 1, 1, 1, 0xffffff, 1.35 );
+				//addShadowedLight( 0.5, 1, -1, 0xffaa00, 1 );            
 
     this.initLights();
 }

@@ -22,6 +22,7 @@
         "styles.css"
       ],
       "scripts": [
+        "../../models",
         "../../Viewer/frameworks/jquery-3.2.1.min.js",
         "../../Viewer/frameworks/three.min.r88.js",
         "../../Viewer/frameworks/stats.min.js",
@@ -32,6 +33,7 @@
         "../../Viewer/frameworks/CopyShader.js",
         "../../Viewer/frameworks/VignetteShader.js",
         "../../Viewer/frameworks/mainViewShader.js",
+        "../../Viewer/frameworks/STLLoader.js",
         "../../Viewer/js/viewManager.js",
         "../../Viewer/js/hudViewer.js",
         "../../Viewer/js/viewer.js"
